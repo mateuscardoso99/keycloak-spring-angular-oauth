@@ -222,7 +222,7 @@ Aqui está o fluxo de como um token de atualização pode ser usado entre atores
 
 
 
-![plot](./directory_1/directory_2/.../directory_n/plot.png)
+![plot](./1.png)
 
 
 
