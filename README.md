@@ -260,6 +260,97 @@ E o que vale a pena mencionar é que o token de identidade foi projetado para se
 
 
 
+---------------------------------------------------------
 
 
 
+
+
+# KEYCLOAK
+
+realm: 
+É puramente uma coisa do Keycloak e é usado para agrupar recursos como usuários, clientes etc. 
+Realms são isolados uns dos outros, então usuários de um realm não serão visíveis em outro, 
+então esses realms podem ser tratados como instâncias separadas de servidores de autorização.
+
+
+
+
+Crie uma credencial de cliente:
+Como estamos construindo uma autenticação e autorização com base no OAuth 2.0 e OpenID, teremos dois aplicativos diferentes 
+— protected resource , que é um aplicativo de backend que serve alguns dados, e um aplicativo cliente , um frontend que desejará acessar dados do protected resource. 
+Para fazer isso, o aplicativo frontend precisará ter um access token. 
+E para obter isso, um cliente precisa ser registrado (ter client id e client secret ) no lado do servidor de autorização, Keycloak em nosso caso.
+
+a configuração do cliente frontend, precisamos primeiro definir um Tipo de Acesso como confidencial e, em seguida, ativar 
+Contas de Serviço Habilitadas e Autorização Habilitada. 
+E, finalmente, precisamos fornecer um URI de Redirecionamento
+
+"client_credentials" esse tipo de concessão é usado quando não há um proprietário de recurso (pessoa, usuário), 
+mas um aplicativo cliente precisa chegar ao recurso protegido usando um token de acesso. 
+Nesse fluxo, um aplicativo cliente está fornecendo apenas suas credenciais e escopo ao servidor de autorização e, 
+como resultado, ele retorna tokens válidos.
+
+
+
+teste:
+fazer um post pra http://localhost:8080/auth/realms/[nome do realm]/protocol/openid-connect/token
+
+com o tipo x-www-form-urlencoded
+e o json: 
+grant_type: client_credentials
+scope: openid
+client_id: [nome do cliente]
+client_secret: [secret key do cliente]
+
+o keycloak retornará o accessToken
+
+
+
+
+
+
+----------------------
+
+
+
+
+
+
+Crie um usuário e funções:
+Depois de registrar um cliente no Keycloak, precisamos criar usuários (proprietários dos recursos) e dar a eles funções diferentes 
+para diferenciar quais ações no recurso protegido eles podem executar.
+
+O primeiro passo seria definir dois papéis — VISITOR & ADMIN. A nomenclatura e o significado real deles não são tão importantes, pelo menos para este projeto de demonstração.
+
+Portanto, para definir um VISITOR, vá para "Roles" disponíveis no painel esquerdo. Em seguida, clique no botão "Add Role". 
+Em uma nova tela, forneça o Role Name e alguma Description e clique em Save .
+Para o ADMINpapel faça o mesmo.
+
+Agora, passamos para o registro de um novo usuário. Portanto, clique no botão Usuários disponível no painel esquerdo e, em seguida, clique no botão Adicionar Usuário . 
+Em uma primeira página, precisamos fornecer algumas informações básicas sobre o usuário, como nome de usuário, e-mail etc.
+
+Após clicar no botão Salvar, a página detalhada aparecerá. Para atribuir a função recém-criada, precisamos ir para a aba Mapeamentos de Função , 
+selecionar a função (no meu caso VISITOR) e então clicar no botão Adicionar selecionado .
+
+E finalmente precisamos configurar uma senha para esse usuário, então vá para a aba Credentials e forneça-a (no meu caso é password). 
+Certifique-se de que o botão de senha temporária esteja desligado.
+
+
+Para testar se tudo está configurado corretamente novamente
+
+Como era antes, gostaria de obter tokens, mas desta vez com um tipo de concessão OAuth 2.0 diferente. Desta vez, usarei o tipo  "password" de concessão, no qual somos solicitados a fornecer credenciais de cliente e de proprietário do recurso.
+
+O método HTTP e a URL não mudam e são:
+
+Método: POST
+URL: http://keycloak:8080/auth/realms/[nome do reino]/protocol/openid-connect/token
+Também o tipo de conteúdo permanece o mesmo — x-www-form-urlencoded. 
+
+O que é diferente é o corpo da solicitação (mas não inteiramente):
+grant_type: password
+scope: openid
+client_id: [nome do cliente]
+client_secret: [secret key do cliente]
+username: [nome do usuário criado acima]
+password: [senha]
