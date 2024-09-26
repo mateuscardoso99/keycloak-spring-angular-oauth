@@ -62,7 +62,7 @@ credenciais necessárias para acessar recursos protegidos por um cliente (explic
 - Recurso Protegido: é um aplicativo que um cliente quer acessar (no exemplo anterior seria GitHub ). 
 Ele autoriza clientes com base em um token de acesso fornecido pelos clientes.
 
-![plot](./directory_1/directory_2/.../directory_n/plot.png)
+![plot](./1.png)
 
 -------------------------
 
@@ -222,7 +222,7 @@ Aqui está o fluxo de como um token de atualização pode ser usado entre atores
 
 
 
-![plot](./1.png)
+![plot](./2.png)
 
 
 
