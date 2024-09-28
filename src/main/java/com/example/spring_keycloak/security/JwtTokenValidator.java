@@ -110,7 +110,7 @@ public class JwtTokenValidator {
      */
     private void verifySignature(DecodedJWT decodedJWT) {
         try {
-            Jwk jwk = jwkProvider.get(decodedJWT.getKeyId());
+            Jwk jwk = jwkProvider.get(decodedJWT.getKeyId());//busca o valor "kid" (O KID é um identificador de chave que faz parte de um JWK e é utilizado para referenciar ou identificar uma chave específica) no JWK recebido do keycloak. ver explicação no README.md
             Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
             algorithm.verify(decodedJWT);
             //log.debug("Token's signature is correct");

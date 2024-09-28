@@ -146,14 +146,33 @@ A principal vantagem dessa abordagem é o fato de que os tokens podem conter alg
 Um exemplo dessas informações poderia ser as permissões do proprietário do recurso. Um dos mais populares, e de fato um padrão, é o JWT.
 
 
+
+
+
+
+
+
+
+
+
 # JWT
+
+1 - O emissor (por exemplo, um servidor web) gera um JWT que contém informações de autenticação, como o usuário e sua ID.
+2- O emissor usa a chave privada para assinar o JWT com um algoritmo de assinatura, como o HMAC (Keyed-Hash Message Authentication Code) ou o RSASSA-PKCS1-v1_5 (RSA with SHA-256).
+3 - O JWT é então enviado ao cliente (por exemplo, um aplicativo web) como um token de autenticação.
+4 - Quando o cliente precisa verificar a autenticidade do JWT, ele utiliza a chave pública do emissor para verificar a assinatura do JWT.
+5 - Se a chave pública for válida e a assinatura estiver correta, o cliente pode ter certeza de que o JWT foi gerado pelo emissor e não foi modificado durante a transmissão.
+
+A chave pública não é incluída no JWT porque isso seria uma vulnerabilidade de segurança. Alguém que tivesse acesso ao JWT poderia usar a chave pública para verificar a assinatura e, em seguida, usar a chave pública para gerar tokens fraudulentos.
+
+Em vez disso, a chave pública é mantida confidencialmente pelo emissor (no caso o keycloak) e é usada apenas para verificar a autenticidade dos JWTs.
 
 exemplo de JWT:
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.
 eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3MjczNjE4MDYsImV4cCI6MTc1ODg5NzgwNiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsIkdpdmVuTmFtZSI6IkpvaG5ueSIsIlN1cm5hbWUiOiJSb2NrZXQiLCJFbWFpbCI6Impyb2NrZXRAZXhhbXBsZS5jb20iLCJSb2xlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.
 lE4ewWkbPXyL4Nd6SoIxdAprxS0JxSvv4erMdFsr5xM
 
-Se você olhar mais de perto, verá que ele é feito de 3 seções separadas por pontos. que são cabeçalho, carga útil e assinatura. respectivamente
+Se você olhar mais de perto, verá que ele é feito de 3 seções separadas por pontos. que são cabeçalho, payload e assinatura. respectivamente
 
 Cada uma dessas seções são JSONs codificados com Base64. A razão para isso é porque os tokens são geralmente transportados em um cabeçalho HTTP, há uma possibilidade de que durante isso alguns dados possam ser modificados (caracteres incomuns, por exemplo). 
 Também torna esses JSONs mais compactados, com menos número de caracteres. 
@@ -165,9 +184,73 @@ partes do jwt:
 iat(issue at) - informa quando o token foi gerado (Unix Epoch),
 exp(expiry) - especifica um registro de data e hora quando o token irá expirar,
 iss(emissor) - indica quem criou um token, geralmente é uma URL para o servidor de autorização,
-sub(assunto) - informa quem são os dados em uma carga útil, geralmente é uma identificação do proprietário do recurso,
+sub(assunto) - informa quem são os dados em um payload, geralmente é uma identificação do proprietário do recurso,
 jti(identificador único) - identificador de um token.
 alg(algoritmo) - especifica que tipo de algoritmo de assinatura foi usado
+
+
+
+-------------------------------------------
+
+O JWT é o acronimo de JSON Web Token. É uma estrutura de dados no formato JSON. 
+Ele é compacto e seguro. URL safe, ou esja, pode trafegar na URL sem prejudicar seu conteúdo.
+O JWT pode ser comparado a uma classe abstrata. JWS e JWE são as implementações do JWT.
+
+Há muitas práticas recomendadas para garantir que JWS sejam à prova de violação. Usar algoritmos simétricos para assinar JWS é desencorajado, pois é um algoritmo relativamente fácil de quebrar e recuperar a chave de hash. 
+Tanto a parte de assinatura quanto a parte de validação usam a mesma chave, então, se essa chave for violada, qualquer um pode criar JWS válido de acordo com suas necessidades.
+
+Seu conteúdo é composto por claims. 
+As Claims são um conjunto de chave/valor. 
+Fornecem ao client ou API informações sobre o usuário que está consumindo seus serviços.
+
+Ele é amplamente utilizado para transferir dados através do protocolo HTTP. 
+Entre clients frontends (SPA) e API's. 
+Pode ser também utilizado para transferência de dados entre API's.
+
+
+
+JWK (Json Web Key):
+	- Define uma estrutura JSON para representar uma chave de criptografia.
+    - é uma estrutura JSON que representa uma chave de criptografia. Na sua estrutura contém as informações para criptografar um JWT (JWE) ou Assinar Digitalmente (JWS).
+    - Dentro de um ambiente OAuth 2.0, o responsável por criar e gerenciar o JWK é o Authorization Server (no caso o keycloak). Como no OAuth 2.0 todos os JWT's são emitidos por um unico servidor ele é quem gerencia o JWK. Assim somente o Authorization Server (no caso o keycloak) pode emitir um JWT.
+    - Certos parâmetros do JWK podem ser públicos, dessa forma os consumidores do JWT podem validar se o JWT não foi adulterado.
+    - Normalmente inclui parâmetros-chave, como o tipo de chave (RSA, ECDSA, chave Octet, etc.), uso da chave (assinatura, criptografia) e o material real da chave. Esses parâmetros são representados como pares de chave-valor JSON.
+    - JWKs são representações baseadas em JSON dessas chaves, enquanto os formatos PEM (formato mais antigo usado para representar chaves criptográficas, frequentemente visto em certificados X.509 e outros contextos relacionados à segurança) e DER (formato binário usado para codificar estruturas de dados como chaves e certificados. É mais compacto, mas menos legível por humanos em comparação ao JSON) são representações binárias alternativas dessas chaves.
+    - Servidores de autorização usam a chave privada do par de chaves para assinar o token enquanto todos os outros serviços usam a chave pública disponível publicamente para verificar o token assinado.
+
+
+
+JWS:
+    - Facilmente confundido como o própio JWT. 
+    - Após assinar digitalmente o JWT, ele torna-se um JWS. 
+    - O JWS é o conteúdo JWT com uma assinatura digital.
+
+
+O que garante segurança ao JWS é sua assinatura digital. 
+A assinatura é o resultado da criptografia da composição do Header & Paylooad.
+
+Dessa forma o conteúdo do JWT (Payload) é legivel, porém, qualquer alteração no conteúdo resultaria numa assinatura diferente.
+
+A chave pública só permite acesso de leitura, por isso sua API ou Client frontend (SPA) consegue validar se o payload do JWT foi alterado. Garantindo confiabilidade e segurança aos consumidores.
+
+- Não é possível gerar a assinatura de uma mensagem, quando você tem apenas a chave pública do RSA. 
+- Você precisa da chave privada para gerar a assinatura
+- Somente quem possui a chave privada consegue gerar uma assinatura válida para o JWT.
+- Você pode usar a chave pública somente para verificar se uma assinatura dada é válida, não para criar novas assinaturas. Somente o dono da chave privada pode fazer isso.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # ASSINATURA JWT
