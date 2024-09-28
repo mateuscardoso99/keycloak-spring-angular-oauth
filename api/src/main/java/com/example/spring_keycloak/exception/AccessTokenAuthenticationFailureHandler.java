@@ -13,6 +13,8 @@ import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+//classe que será chamada quando AuthenticationException for lançada
+//em nosso aplicativo InvalidTokenExceptionestá estendendo esta classe abstrata
 public class AccessTokenAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     @Override
