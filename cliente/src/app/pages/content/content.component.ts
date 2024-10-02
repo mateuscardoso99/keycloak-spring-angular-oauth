@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatTable } from '@angular/material/table';
+import { MatTable, MatTableModule } from '@angular/material/table';
 import { KeycloakService } from 'keycloak-angular';
 import { Movie, MovieBackendService } from '../../services/MovieBackendService';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -12,7 +12,7 @@ import { MatSortModule } from '@angular/material/sort';
   selector: 'app-content',
   standalone: true,
   templateUrl: './content.component.html',
-  imports: [MatTabsModule, MatOptionModule, MatSelectModule, MatSortModule, MatTable],
+  imports: [MatTabsModule, MatOptionModule, MatSelectModule, MatSortModule, MatTableModule],
   styleUrls: ['./content.component.scss']
 })
 export class ContentComponent {

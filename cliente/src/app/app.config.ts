@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { KeycloakBearerInterceptor, KeycloakService } from 'keycloak-angular';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 export function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
@@ -16,7 +17,8 @@ export function initializeKeycloak(keycloak: KeycloakService) {
           initOptions: {
               //onLoad: 'check-sso',
               //silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html'
-              checkLoginIframe: false
+              checkLoginIframe: false,
+              redirectUri: 'http://localhost:4200'
           },
           // Enables Bearer interceptor
           enableBearerInterceptor: true,
@@ -57,6 +59,7 @@ export const appConfig: ApplicationConfig = {
     KeycloakInitializerProvider, // Initializes Keycloak
     KeycloakBearerInterceptorProvider, // Provides Keycloak Bearer Interceptor
     KeycloakService,
-    provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes)
+    provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes),
+    provideAnimations()
   ]
 };
