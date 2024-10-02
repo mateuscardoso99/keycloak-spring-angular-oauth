@@ -32,6 +32,14 @@ public class AccessToken {
         return value;
     }
 
+    public String getUsername(){
+        return decodeToken(value).getClaim("name").toString();
+    }
+
+    public String getEmail(){
+        return decodeToken(value).getClaim("email").toString();
+    }
+
     //método auxiliar que retorna um Collection de GrantedAuthorities, no nosso caso, funções Keycloak.
     public Collection<? extends GrantedAuthority> getAuthorities() {
         DecodedJWT decodedJWT = decodeToken(value);

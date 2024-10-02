@@ -1,6 +1,7 @@
 package com.example.spring_keycloak.security;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -46,10 +47,12 @@ public class AccessTokenFilter extends AbstractAuthenticationProcessingFilter{
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         //log.info("Attempting to authenticate for a request {}", request.getRequestURI());
-
         String authorizationHeader = extractAuthorizationHeaderAsString(request);
         AccessToken accessToken = tokenVerifier.validateAuthorizationHeader(authorizationHeader);
-        return this.getAuthenticationManager().authenticate(new JwtAuthentication(accessToken));
+        JwtAuthentication auth = new JwtAuthentication(accessToken);
+        auth.setAuthenticated(true);
+        auth.setDetails(Map.of("username", accessToken.getUsername(), "email", accessToken.getEmail()));
+        return this.getAuthenticationManager().authenticate(auth);
     }
 
     //após a autenticação bem-sucedida, um objeto Authentication (no nosso caso, a classe JwtAuthentication) é adicionado ao SecurityContextHolder, que armazena todas as informações sobre o usuário atual que está fazendo uma solicitação

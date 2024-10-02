@@ -9,14 +9,15 @@ export function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
       keycloak.init({
           config: {
-              url: 'http://localhost:8090' + '/auth',
-              realm: 'test', //nome do realm criado no keycloak
+              url: 'http://localhost:8090',
+              realm: 'teste', //nome do realm criado no keycloak
               clientId: 'frontend', //clientId criado no keycloak
           },
-          /*initOptions: {
-              onLoad: 'check-sso',
-              silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html'
-          },*/
+          initOptions: {
+              //onLoad: 'check-sso',
+              //silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html'
+              checkLoginIframe: false
+          },
           // Enables Bearer interceptor
           enableBearerInterceptor: true,
           // Prefix for the Bearer token

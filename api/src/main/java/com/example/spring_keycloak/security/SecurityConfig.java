@@ -7,15 +7,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -29,7 +33,6 @@ import com.example.spring_keycloak.exception.AccessTokenAuthenticationFailureHan
  */
 
 @Configuration
-@Order(1)
 @EnableWebSecurity //habilita recursos de segurança
 public class SecurityConfig {
     @Autowired
@@ -66,12 +69,19 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.debug(true);
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.cors(v -> v.configurationSource(corsConfigurationSource()))
+            .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))//significa que as informações do usuário não são armazenadas na memória entre as solicitações e impede que o Spring crie sessões HTTP
-            .csrf(CsrfConfigurer::disable)
             .authorizeHttpRequests((request) -> {
-                request.requestMatchers(urlsDesprotegidas).permitAll()
+                request.requestMatchers(HttpMethod.GET,"/publico/**").permitAll()
+                    //.requestMatchers(HttpMethod.GET,"/filmes/**").hasRole("VISITANTE")
                     .anyRequest().authenticated();
                 }
             )
